@@ -1,45 +1,63 @@
 "use client";
-
+import React, { useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useRef } from "react";
-import { Box } from "@react-three/drei";
-function RotatingCube() {
-  const cubeRef = useRef();
-
-  // Rotate the cube on each frame
-  useFrame(() => {
-    cubeRef.current.rotation.x += 0.01;
-    cubeRef.current.rotation.y += 0.01;
+import {
+  MeshWobbleMaterial,
+  OrbitControls,
+  useHelper,
+} from "@react-three/drei";
+import { DirectionalLightHelper } from "three";
+import { Leva, useControls } from "leva";
+const Box = ({ position, size, color }) => {
+  const boxRef = useRef();
+  // useFrame((state, delta, xrFrame) => {
+  //   boxRef.current.rotation.x += delta;
+  //   boxRef.current.rotation.y += delta;
+  // });
+  return (
+    <mesh position={position} ref={boxRef}>
+      <boxGeometry args={size} />
+      <MeshWobbleMaterial factor={0.5} speed={15} color={color} />
+      {/* <meshStandardMaterial color={color} /> */}
+    </mesh>
+  );
+};
+const Scene = () => {
+  const directionalLightRef = useRef();
+  const { lightColor, lightIntensity } = useControls({
+    lightColor: "blue",
+    lightIntensity: {
+      value: 2,
+      min: 0,
+      max: 10,
+    },
   });
-
+  useHelper(directionalLightRef, DirectionalLightHelper, 0.5, "green");
   return (
-    <Box ref={cubeRef}>
-      <meshStandardMaterial attach="material" color="red" />
-    </Box>
+    <>
+      <directionalLight
+        position={[1, 0, 1]}
+        ref={directionalLightRef}
+        color={lightColor}
+        intensity={lightIntensity}
+      />
+      <Box position={[0, 0, 0]} size={[1, 1, 1]} color={"white"} />
+      <OrbitControls />
+    </>
+  );
+};
+
+function page() {
+  return (
+    <div className="flex justify-center items-center h-screen w-full border border-red-200 bg-white">
+      <main className="h-full w-full">
+        <Leva />
+        <Canvas>
+          <Scene />
+        </Canvas>
+      </main>
+    </div>
   );
 }
 
-export default function Home() {
-  return (
-    <main className="h-full w-full">
-      <h1>Next.js + Three.js Sample</h1>
-
-      <Canvas
-        style={{ height: "100vh" }}
-        camera={{ position: [0, 0, 5] }}
-        onPointerMove={(event) => {
-          const { clientX, clientY } = event;
-          const x = clientX / window.innerWidth;
-          const y = clientY / window.innerHeight;
-          // Update camera rotation based on mouse position
-          event.camera.position.x = (x - 0.5) * 10;
-          event.camera.position.y = (y - 0.5) * 10;
-        }}
-      >
-        <ambientLight />
-        <pointLight position={[10, 10, 10]} />
-        <RotatingCube />
-      </Canvas>
-    </main>
-  );
-}
+export default page;

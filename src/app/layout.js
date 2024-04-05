@@ -16,7 +16,9 @@ export default function RootLayout({ children }) {
         <meta name="description" content="Next.js + Three.js Sample" />
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className + "min-h-[100vh] container mx-auto"}>
+        {children}
+      </body>
     </html>
   );
 }
